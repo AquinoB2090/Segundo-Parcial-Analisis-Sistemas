@@ -178,6 +178,46 @@ h2 { font-size: 19px; line-height: 26px; }
 .toast[data-kind="error"] { background: #772b25; border-color: #98433b; }
 .toast svg { flex: 0 0 auto; height: 17px; width: 17px; }
 
+.fc {
+    --fc-border-color: #dfe5e3;
+    --fc-button-bg-color: #fff;
+    --fc-button-border-color: #c2cdca;
+    --fc-button-hover-bg-color: #f4f7f6;
+    --fc-button-hover-border-color: #aebbb8;
+    --fc-button-active-bg-color: #dff3ef;
+    --fc-button-active-border-color: #74aaa3;
+    --fc-event-border-color: transparent;
+    --fc-page-bg-color: #fff;
+    --fc-today-bg-color: #f0f8f6;
+    font-size: 13px;
+}
+.fc .fc-toolbar { gap: 14px; margin-bottom: 16px; }
+.fc .fc-toolbar-title { color: #24312e; font-size: 18px; font-weight: 720; text-transform: capitalize; }
+.fc .fc-button {
+    border-radius: 5px; box-shadow: none !important; color: #33413e; font-size: 12px;
+    font-weight: 650; min-height: 34px; padding: 6px 10px; text-transform: capitalize;
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active { color: #0c655e; }
+.fc .fc-button-primary:disabled { background: #eef2f1; border-color: #d5dddb; color: #7b8784; opacity: 1; }
+.fc .fc-col-header-cell-cushion, .fc .fc-daygrid-day-number { color: #475451; text-decoration: none; }
+.fc .fc-col-header-cell-cushion { font-size: 11px; font-weight: 700; padding: 9px 4px; text-transform: uppercase; }
+.fc .fc-daygrid-day-number { font-size: 12px; padding: 7px; }
+.fc .fc-day-other .fc-daygrid-day-number { color: #9aa4a1; }
+.fc .fc-daygrid-day-frame { min-height: 104px; }
+.fc .fc-timegrid-slot-label-cushion { color: #75817e; font-size: 11px; }
+.fc .fc-timegrid-axis-cushion { color: #75817e; font-size: 11px; }
+.fc .fc-event { border-radius: 4px; box-shadow: none; cursor: pointer; font-size: 11px; padding: 1px 3px; }
+.fc .fc-event.appointment-cancelada { opacity: .62; text-decoration: line-through; }
+.fc .fc-event.appointment-atendida { opacity: .82; }
+.fc .fc-daygrid-more-link { color: var(--primary); font-size: 11px; font-weight: 700; }
+.fc .fc-highlight { background: rgb(15 118 110 / 10%); }
+
+@media (max-width: 860px) {
+    .fc .fc-toolbar { align-items: flex-start; flex-wrap: wrap; }
+    .fc .fc-toolbar-chunk:nth-child(2) { order: -1; width: 100%; }
+    .fc .fc-toolbar-title { font-size: 16px; }
+}
+
 @media (max-width: 1024px) {
     .app-header, .workspace { padding-left: 20px; padding-right: 20px; }
     .calendar-toolbar { flex-wrap: wrap; }
