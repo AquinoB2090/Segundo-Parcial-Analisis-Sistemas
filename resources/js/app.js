@@ -5,6 +5,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import {
+    appointmentEvent, calendarQuery, defaultTimes, eventChangePayload, localDate,
+} from './agenda-utils';
+import {
     CalendarDays, Check, ChevronDown, CircleAlert, CircleCheck, Clock3, createIcons,
     Cross, Pencil, Plus, RefreshCw, Stethoscope, UserRound, X,
 } from 'lucide';
@@ -63,13 +66,6 @@ if (calendarElement) {
         toastRegion: document.querySelector('#toast-region'),
     };
 
-    const statusStyles = {
-        pendiente: { backgroundColor: '#b7791f', borderColor: '#8f5c12', textColor: '#ffffff' },
-        confirmada: { backgroundColor: '#16794b', borderColor: '#0f603a', textColor: '#ffffff' },
-        atendida: { backgroundColor: '#2f62b5', borderColor: '#244d8e', textColor: '#ffffff' },
-        cancelada: { backgroundColor: '#a53b3b', borderColor: '#843030', textColor: '#ffffff' },
-    };
-
     let doctors = [];
     let patients = [];
     let selectedAppointment = null;
@@ -98,32 +94,6 @@ if (calendarElement) {
         }
 
         return payload.data;
-    }
-
-    function localDate(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    function localTime(date) {
-        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    }
-
-    function appointmentEvent(appointment) {
-        const style = statusStyles[appointment.estado];
-
-        return {
-            id: String(appointment.id),
-            title: `${appointment.paciente.nombre} · ${appointment.doctor.nombre}`,
-            start: `${appointment.fecha}T${appointment.hora_inicio}:00`,
-            end: `${appointment.fecha}T${appointment.hora_fin}:00`,
-            editable: appointment.estado !== 'cancelada' && appointment.estado !== 'atendida',
-            classNames: [`appointment-${appointment.estado}`],
-            extendedProps: { appointment },
-            ...style,
-        };
     }
 
     function populateSelect(select, records, placeholder, label) {
@@ -203,14 +173,6 @@ if (calendarElement) {
         if (dialog.open) dialog.close();
     }
 
-    function defaultTimes(date = new Date()) {
-        const start = new Date(date);
-        start.setMinutes(Math.ceil(start.getMinutes() / 30) * 30, 0, 0);
-        if (start.getHours() < 8 || start.getHours() >= 18) start.setHours(9, 0, 0, 0);
-        const end = new Date(start.getTime() + 30 * 60 * 1000);
-        return { start: localTime(start), end: localTime(end) };
-    }
-
     function openAppointmentDialog(appointment = null, prefillDate = null) {
         clearFormErrors();
         elements.appointmentForm.reset();
@@ -275,11 +237,7 @@ if (calendarElement) {
         try {
             const appointment = await apiRequest(`/api/citas/${event.id}`, {
                 method: 'PUT',
-                body: JSON.stringify({
-                    fecha: localDate(event.start),
-                    hora_inicio: localTime(event.start),
-                    hora_fin: localTime(event.end),
-                }),
+                body: JSON.stringify(eventChangePayload(event)),
             });
             event.setExtendedProp('appointment', appointment);
             showToast('La cita fue reprogramada.');
@@ -316,14 +274,10 @@ if (calendarElement) {
             elements.calendarLoading.hidden = !isLoading;
         },
         events: async (info, success, failure) => {
-            const end = new Date(info.end);
-            end.setDate(end.getDate() - 1);
-            const parameters = new URLSearchParams({
-                desde: localDate(info.start),
-                hasta: localDate(end),
+            const parameters = calendarQuery(info.start, info.end, {
+                doctorId: elements.doctorFilter.value,
+                patientId: elements.patientFilter.value,
             });
-            if (elements.doctorFilter.value) parameters.set('doctor_id', elements.doctorFilter.value);
-            if (elements.patientFilter.value) parameters.set('paciente_id', elements.patientFilter.value);
 
             try {
                 const appointments = await apiRequest(`/api/citas?${parameters}`);
