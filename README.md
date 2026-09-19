@@ -28,8 +28,8 @@ e instala y compila recursos con npm. Es un comando de instalacion inicial:
 si se repite, genera una nueva clave de aplicacion.
 
 Aplicacion: <http://127.0.0.1:8000>. Salud: <http://127.0.0.1:8000/up>.
-La pantalla inicial es la bienvenida de Laravel. La API REST y FullCalendar
-quedan pendientes en el [backlog](BACKLOG.md).
+La pantalla inicial es la bienvenida de Laravel. La API REST esta disponible
+bajo `/api`; FullCalendar queda pendiente en el [backlog](BACKLOG.md).
 
 ## Arranque Habitual
 
@@ -110,6 +110,52 @@ mismos registros no duplica filas ni revierte cambios de estado. Las citas
 semilla se identifican por doctor, paciente, fecha y hora inicial: si se
 reprograman y se vuelve a sembrar, se recrea la cita de ejemplo original.
 Las tablas de usuarios, sesiones, cache y trabajos son las internas de Laravel.
+
+## API REST
+
+Todas las respuestas son JSON. Los recursos exitosos usan la propiedad `data`;
+los errores incluyen `message` y, para validaciones, `errors` por campo.
+
+| Metodo | Ruta | Respuesta | Proposito |
+| --- | --- | --- | --- |
+| `GET` | `/api/citas` | `200` | Lista citas con doctor y paciente. |
+| `POST` | `/api/citas` | `201`, `400`, `409` | Crea una cita. |
+| `GET` | `/api/citas/{id}` | `200`, `404` | Devuelve el detalle. |
+| `PUT` | `/api/citas/{id}` | `200`, `400`, `404`, `409` | Edita o reprograma campos enviados. |
+| `PATCH` | `/api/citas/{id}/estado` | `200`, `400`, `404`, `409` | Cambia el estado. |
+| `GET` | `/api/doctores` | `200` | Lista doctores activos. |
+| `GET` | `/api/pacientes` | `200` | Lista pacientes. |
+
+`GET /api/citas` admite `doctor_id`, `paciente_id`, `desde` y `hasta`; las
+fechas usan `YYYY-MM-DD`. La creacion requiere `paciente_id`, `doctor_id`,
+`fecha`, `hora_inicio`, `hora_fin` y `motivo`. Las horas usan `HH:mm`.
+
+```json
+{
+  "paciente_id": 1,
+  "doctor_id": 1,
+  "fecha": "2026-09-28",
+  "hora_inicio": "11:00",
+  "hora_fin": "11:30",
+  "motivo": "Consulta general"
+}
+```
+
+La actualizacion `PUT` acepta uno o mas de esos campos, excepto `estado`.
+El cambio de estado usa este cuerpo:
+
+```json
+{
+  "estado": "confirmada"
+}
+```
+
+Los estados permitidos son `pendiente`, `confirmada`, `cancelada` y `atendida`.
+No existe borrado fisico: cancelar mediante `PATCH` conserva el historial y
+cubre la baja logica del CRUD. Una cita cancelada deja libre su horario. Al
+crear, reprogramar o reactivar, el servidor bloquea al doctor dentro de una
+transaccion y responde `409` si otra cita activa se solapa. Los horarios que
+terminan exactamente cuando comienza otro son validos.
 
 ## Verificacion
 
