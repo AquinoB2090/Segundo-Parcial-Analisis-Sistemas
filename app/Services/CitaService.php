@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\EstadoCita;
 use App\Exceptions\HorarioNoDisponibleException;
 use App\Models\Cita;
 use App\Models\Doctor;
@@ -47,7 +48,7 @@ class CitaService
         return DB::transaction(function () use ($cita, $estado): Cita {
             $this->bloquearDoctor($cita->doctor_id);
 
-            if ($estado !== 'cancelada') {
+            if (EstadoCita::from($estado)->ocupaHorario()) {
                 $this->comprobarDisponibilidad([
                     ...$cita->only(['doctor_id', 'fecha', 'hora_inicio', 'hora_fin']),
                     'estado' => $estado,
@@ -67,14 +68,14 @@ class CitaService
 
     private function comprobarDisponibilidad(array $datos, ?int $ignorarCitaId = null): void
     {
-        if (($datos['estado'] ?? 'pendiente') === 'cancelada') {
+        if (! EstadoCita::from($datos['estado'] ?? EstadoCita::Pendiente->value)->ocupaHorario()) {
             return;
         }
 
         $existeConflicto = Cita::query()
             ->where('doctor_id', $datos['doctor_id'])
             ->whereDate('fecha', $datos['fecha'])
-            ->where('estado', '!=', 'cancelada')
+            ->where('estado', '!=', EstadoCita::Cancelada->value)
             ->where('hora_inicio', '<', $datos['hora_fin'])
             ->where('hora_fin', '>', $datos['hora_inicio'])
             ->when($ignorarCitaId, fn ($query) => $query->whereKeyNot($ignorarCitaId))

@@ -31,12 +31,24 @@ class ActualizarCitaRequest extends ApiRequest
             }
 
             $cita = $this->route('cita');
-            $inicio = $this->input('hora_inicio', $cita?->hora_inicio);
-            $fin = $this->input('hora_fin', $cita?->hora_fin);
+            $inicio = $this->normalizarHora($this->input('hora_inicio', $cita?->hora_inicio));
+            $fin = $this->normalizarHora($this->input('hora_fin', $cita?->hora_fin));
 
-            if ($inicio !== null && $fin !== null && $fin <= $inicio) {
+            if (! $validator->errors()->hasAny(['hora_inicio', 'hora_fin'])
+                && $inicio !== null
+                && $fin !== null
+                && $fin <= $inicio) {
                 $validator->errors()->add('hora_fin', 'La hora de fin debe ser posterior a la hora de inicio.');
             }
         }];
+    }
+
+    private function normalizarHora(mixed $hora): ?string
+    {
+        if (! is_string($hora)) {
+            return null;
+        }
+
+        return strlen($hora) === 5 ? $hora.':00' : $hora;
     }
 }

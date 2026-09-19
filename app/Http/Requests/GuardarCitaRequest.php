@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\EstadoCita;
 use Illuminate\Validation\Rule;
 
 class GuardarCitaRequest extends ApiRequest
@@ -19,7 +20,7 @@ class GuardarCitaRequest extends ApiRequest
             'hora_inicio' => ['required', 'date_format:H:i'],
             'hora_fin' => ['required', 'date_format:H:i', 'after:hora_inicio'],
             'motivo' => ['required', 'string', 'max:1000'],
-            'estado' => ['sometimes', Rule::in(['pendiente', 'confirmada', 'cancelada', 'atendida'])],
+            'estado' => ['sometimes', Rule::enum(EstadoCita::class)],
         ];
     }
 }
