@@ -28,8 +28,8 @@ e instala y compila recursos con npm. Es un comando de instalacion inicial:
 si se repite, genera una nueva clave de aplicacion.
 
 Aplicacion: <http://127.0.0.1:8000>. Salud: <http://127.0.0.1:8000/up>.
-La pantalla inicial es la bienvenida de Laravel. La API REST esta disponible
-bajo `/api`; FullCalendar queda pendiente en el [backlog](BACKLOG.md).
+La pantalla inicial es la agenda medica con FullCalendar; la API REST esta
+disponible bajo `/api`.
 
 ## Arranque Habitual
 
@@ -187,6 +187,25 @@ Ejemplo de error de validacion:
 }
 ```
 
+## Calendario e Interfaz
+
+La agenda usa FullCalendar 6 con vistas de mes y semana. Consulta las citas del
+rango visible y aplica filtros por doctor y paciente. Los estados se distinguen
+por color: amarillo para pendiente, verde para confirmada, azul para atendida y
+rojo para cancelada.
+
+Desde la interfaz se puede crear una cita, abrir su detalle, editar sus datos y
+cambiar su estado. Las citas pendientes o confirmadas se pueden arrastrar o
+redimensionar; el cambio se envia a `PUT /api/citas/{id}`. Si el servidor rechaza
+la operacion, FullCalendar revierte el movimiento y muestra el error. Las citas
+canceladas y atendidas permanecen bloqueadas contra arrastre.
+
+El calendario carga automaticamente `desde` y `hasta` segun el rango de la
+vista. En escritorio presenta filtros y leyenda en una sola franja; en tablet
+los controles se reorganizan sin cambiar el tamano del calendario ni de sus
+botones. Los dialogos usan controles nativos accesibles y los botones de icono
+incluyen nombre para tecnologias de asistencia.
+
 ## Verificacion
 
 ```sh
@@ -194,6 +213,7 @@ composer validate --strict
 docker compose config --quiet
 php artisan test
 php vendor/bin/pint --test
+npm run test:frontend
 npm run build
 ```
 
@@ -222,4 +242,7 @@ El arranque no depende de Laravel Sail ni de la extension `pcntl`.
 Referencias: [instalacion de Laravel 12](https://laravel.com/docs/12.x/installation),
 [requisitos PHP](https://laravel.com/docs/12.x/deployment#server-requirements),
 [semillas](https://laravel.com/docs/12.x/seeding) e
-[imagen oficial MySQL](https://hub.docker.com/_/mysql).
+[imagen oficial MySQL](https://hub.docker.com/_/mysql). Para el calendario:
+[vistas](https://fullcalendar.io/docs/month-view),
+[eventos JSON](https://fullcalendar.io/docs/events-json-feed) y
+[drag & drop](https://fullcalendar.io/docs/event-dragging-resizing).
