@@ -61,10 +61,14 @@ class CitaController extends Controller
         return new CitaResource($cita);
     }
 
-    public function updateEstado(ActualizarEstadoCitaRequest $request, Cita $cita): CitaResource
+    public function updateEstado(ActualizarEstadoCitaRequest $request, Cita $cita): JsonResponse|CitaResource
     {
-        $cita->update($request->validated());
+        try {
+            $cita = $this->citaService->actualizarEstado($cita, $request->validated('estado'));
+        } catch (HorarioNoDisponibleException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 409);
+        }
 
-        return new CitaResource($cita->refresh()->load(['doctor', 'paciente']));
+        return new CitaResource($cita);
     }
 }

@@ -40,6 +40,24 @@ class CitaService
         });
     }
 
+    public function actualizarEstado(Cita $cita, string $estado): Cita
+    {
+        return DB::transaction(function () use ($cita, $estado): Cita {
+            $this->bloquearDoctor($cita->doctor_id);
+
+            if ($estado !== 'cancelada') {
+                $this->comprobarDisponibilidad([
+                    ...$cita->only(['doctor_id', 'fecha', 'hora_inicio', 'hora_fin']),
+                    'estado' => $estado,
+                ], $cita->id);
+            }
+
+            $cita->update(['estado' => $estado]);
+
+            return $cita->refresh()->load(['doctor', 'paciente']);
+        });
+    }
+
     private function bloquearDoctor(int $doctorId): void
     {
         Doctor::query()->whereKey($doctorId)->lockForUpdate()->firstOrFail();

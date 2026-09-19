@@ -26,6 +26,10 @@ class ActualizarCitaRequest extends ApiRequest
     public function after(): array
     {
         return [function (Validator $validator): void {
+            if (! $this->hasAny(['paciente_id', 'doctor_id', 'fecha', 'hora_inicio', 'hora_fin', 'motivo'])) {
+                $validator->errors()->add('cita', 'Debe proporcionar al menos un campo para actualizar.');
+            }
+
             $cita = $this->route('cita');
             $inicio = $this->input('hora_inicio', $cita?->hora_inicio);
             $fin = $this->input('hora_fin', $cita?->hora_fin);
