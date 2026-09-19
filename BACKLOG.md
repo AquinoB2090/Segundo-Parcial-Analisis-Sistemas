@@ -5,7 +5,8 @@ REST. El estado distingue la capacidad completa de los avances de backend.
 
 ## Trabajo de Esta Rama
 
-Ramas documentadas: `feature/docker-mysql-schema` y `feature/api-rest-citas`.
+Ramas documentadas: `feature/docker-mysql-schema`, `feature/api-rest-citas` y
+`feature/validacion-conflictos-estados`.
 
 | Paso | Categoria | ID relacionados | Estado | Evidencia |
 | --- | --- | --- | --- | --- |
@@ -18,6 +19,9 @@ Ramas documentadas: `feature/docker-mysql-schema` y `feature/api-rest-citas`.
 | Conflictos, reprogramacion y estados transaccionales | Negocio | RQF-03, RQF-04, RQF-05, RQNF-07 | Hecho en backend | `25773e7` |
 | Pruebas HTTP en SQLite y MySQL | Calidad | RQF-01, RQF-03, RQF-07, RQF-08, RQNF-03 | Hecho | `1763961` |
 | Contratos, ejemplos y evidencia de la API | Documentacion | RQNF-05, RQNF-08 | Hecho en esta entrega | Commit `docs(RQF-07,RQNF-08)` |
+| Estados centralizados, mensajes en espanol y horas parciales | Validaciones | RQF-08, RQNF-03 | Hecho | `c62dd18` |
+| Casos limite y cinco tipos de solapamiento | Calidad | RQF-03, RQF-08, RQNF-07 | Hecho | `9d0830b` |
+| Matriz y evidencia de validaciones | Documentacion | RQNF-05, RQNF-08 | Hecho en esta entrega | Commit `docs(RQF-08,RQNF-08)` |
 
 ## Pendientes del Sistema
 
@@ -38,5 +42,5 @@ propuestas para el trabajo restante:
 - `feature/evidencia-integracion`: evidencia de integracion.
 
 Las ramas restantes son propuestas, no un registro de creacion. Los commits de
-la API estan locales en `feature/api-rest-citas`; su push, PR y merge siguen
-pendientes.
+validaciones estan locales en `feature/validacion-conflictos-estados`; su push,
+PR y merge siguen pendientes.

@@ -22,7 +22,10 @@ class ListarCitasRequest extends ApiRequest
             $desde = $this->input('desde');
             $hasta = $this->input('hasta');
 
-            if (is_string($desde) && is_string($hasta) && $hasta < $desde) {
+            if (! $validator->errors()->hasAny(['desde', 'hasta'])
+                && is_string($desde)
+                && is_string($hasta)
+                && $hasta < $desde) {
                 $validator->errors()->add('hasta', 'La fecha hasta debe ser igual o posterior a la fecha desde.');
             }
         }];

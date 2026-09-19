@@ -138,7 +138,8 @@ php artisan test
 Se registraron siete rutas: listado, creacion, detalle y actualizacion de citas;
 cambio de estado; listado de doctores y listado de pacientes. La suite completa
 se ejecuto en SQLite en memoria y en `citas_medicas_test` sobre MySQL 8.4.
-En ambos motores el resultado fue **23 pruebas aprobadas, 132 aserciones**.
+Tras completar las validaciones, en ambos motores el resultado es de
+**31 pruebas aprobadas, 176 aserciones**.
 
 Las pruebas cubren respuestas `200`, `201`, `400`, `404` y `409`; filtros por
 doctor, paciente y fechas; relaciones JSON; datos obligatorios; referencias
@@ -159,6 +160,33 @@ La comprobacion de conflicto no creo registros. Una cita temporal utilizada
 para inspeccionar el cuerpo `201` se elimino por su identidad exacta; la base
 local conserva las 5 citas semilla.
 
+## Validaciones
+
+Rama: `feature/validacion-conflictos-estados`.
+
+Se centralizaron los estados en `EstadoCita`, los mensajes y nombres de campos
+en `ApiRequest`, y se corrigio la comparacion entre horas recibidas como
+`HH:mm` y horas persistidas como `HH:mm:ss`. Antes de la correccion, actualizar
+solo el inicio con un valor igual al fin existente podia evadir la comprobacion
+por la diferencia de longitud; ahora se normalizan ambos valores antes de
+compararlos y se responde `400` sin modificar la cita.
+
+`ValidacionCitaApiTest` agrega **8 pruebas y 44 aserciones** para:
+
+- campos obligatorios y mensajes en espanol;
+- paciente inexistente y doctor inactivo;
+- fecha imposible, hora invalida, fin no posterior y motivo de mas de 1000 caracteres;
+- actualizacion parcial que deja horas iguales;
+- coincidencia exacta, contencion y solapamiento por ambos extremos;
+- mismo horario permitido para doctores distintos;
+- estado desconocido sin alterar el estado actual;
+- cuerpo JSON malformado respondido como JSON con codigo `400`.
+
+La suite se ejecuto nuevamente con `php artisan test` en SQLite y con las
+variables `DB_CONNECTION=mysql` y `DB_DATABASE=citas_medicas_test`. Ambos
+resultados fueron **31 pruebas aprobadas y 176 aserciones**. Pint tambien paso
+sin cambios pendientes.
+
 ## Commits por Paso
 
 | Commit | Paso | ID |
@@ -172,7 +200,10 @@ local conserva las 5 citas semilla.
 | `25773e7` | Disponibilidad y estados transaccionales | RQF-03, RQF-05, RQNF-07 |
 | `1763961` | Pruebas HTTP en SQLite y MySQL | RQF-01, RQF-03, RQF-07, RQF-08, RQNF-03 |
 | `docs(RQF-07,RQNF-08)` | Contratos y evidencia de API | RQF-07, RQNF-08 |
+| `c62dd18` | Reglas compartidas, mensajes y normalizacion de horas | RQF-08, RQNF-03 |
+| `9d0830b` | Pruebas de validaciones y conflictos | RQF-03, RQF-08, RQNF-07 |
+| `docs(RQF-08,RQNF-08)` | Matriz y evidencia de validaciones | RQF-08, RQNF-08 |
 
 Consultar el hash del ultimo commit con
-`git log --oneline --grep="docs(RQF-07,RQNF-08)"`. Esta entrega no se ha
+`git log --oneline --grep="docs(RQF-08,RQNF-08)"`. Esta entrega no se ha
 publicado ni integrado a main; registrar el PR y merge cuando ocurran.
