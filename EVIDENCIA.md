@@ -1,12 +1,12 @@
 # Evidencia del Entorno Laravel y Docker
 
-Fecha: 2026-09-19. Rama: `feature/docker-mysql-schema`.
+Fecha: 2026-09-19. Rama: `feature/fullcalendar-ui`.
 
 ## Alcance y Versiones
 
 PHP y Laravel corren en Windows; Docker ejecuta solamente MySQL. Se verificaron
-arranque, conexion, migraciones, semillas, restricciones, persistencia y API
-REST. FullCalendar queda pendiente.
+arranque, conexion, migraciones, semillas, restricciones, persistencia, API
+REST y la agenda interactiva con FullCalendar.
 
 | Componente | Version observada |
 | --- | --- |
@@ -187,6 +187,39 @@ variables `DB_CONNECTION=mysql` y `DB_DATABASE=citas_medicas_test`. Ambos
 resultados fueron **31 pruebas aprobadas y 176 aserciones**. Pint tambien paso
 sin cambios pendientes.
 
+## FullCalendar e Interfaz
+
+Rama: `feature/fullcalendar-ui`.
+
+Se instalaron `@fullcalendar/core`, `daygrid`, `timegrid` e `interaction` en
+version 6.1.21, junto con Lucide 1.47.0. La pagina `/` presenta la agenda y
+consume los siete endpoints existentes. Incluye mes, semana, filtros, creacion,
+detalle, edicion, estado por color, cambio de estado, arrastre y redimensionado.
+
+```sh
+npm run test:frontend
+npm run build
+php artisan test
+node --check resources/js/app.js
+```
+
+Resultados:
+
+- **6 pruebas frontend aprobadas** para fechas locales, rangos inclusivos,
+  colores, bloqueo de estados finales, horarios predeterminados y contrato `PUT`.
+- **32 pruebas PHP aprobadas, 184 aserciones**, incluida la presencia de la
+  vista, filtros y dialogos.
+- Vite proceso 1929 modulos y genero el bundle sin errores.
+- La pagina `/` respondio `200`, incluyo el calendario y ambos dialogos; el
+  bundle JavaScript generado respondio `200` con 323829 bytes.
+- MySQL permanecio saludable y la API conservo las 5 citas semilla.
+
+El navegador integrado no estuvo disponible durante esta ejecucion: su lista
+de navegadores fue vacia. Por esa razon no se realizaron capturas ni una prueba
+visual automatizada de escritorio/tablet. La validacion disponible cubrio HTML,
+JavaScript, compilacion y contratos de API; la inspeccion visual queda registrada
+como evidencia pendiente, sin afirmar que fue ejecutada.
+
 ## Commits por Paso
 
 | Commit | Paso | ID |
@@ -199,11 +232,15 @@ sin cambios pendientes.
 | `e84abcd` | Endpoints, validaciones y recursos JSON | RQF-07, RQF-08, RQNF-03 |
 | `25773e7` | Disponibilidad y estados transaccionales | RQF-03, RQF-05, RQNF-07 |
 | `1763961` | Pruebas HTTP en SQLite y MySQL | RQF-01, RQF-03, RQF-07, RQF-08, RQNF-03 |
-| `docs(RQF-07,RQNF-08)` | Contratos y evidencia de API | RQF-07, RQNF-08 |
+| `9f514e1` | Contratos y evidencia de API | RQF-07, RQNF-08 |
 | `c62dd18` | Reglas compartidas, mensajes y normalizacion de horas | RQF-08, RQNF-03 |
 | `9d0830b` | Pruebas de validaciones y conflictos | RQF-03, RQF-08, RQNF-07 |
-| `docs(RQF-08,RQNF-08)` | Matriz y evidencia de validaciones | RQF-08, RQNF-08 |
+| `d3f41d1` | Matriz y evidencia de validaciones | RQF-08, RQNF-08 |
+| `2639197` | Base visual adaptable y dependencias | RQF-02, RQNF-06 |
+| `f720ea0` | FullCalendar e interacciones con la API | RQF-02, RQF-04, RQF-09, RQF-10 |
+| `bb5d02a` | Pruebas de pagina y logica del calendario | RQF-02, RQF-04, RQNF-06 |
+| `docs(RQF-02,RQNF-08)` | Guia y evidencia del calendario | RQF-02, RQNF-08 |
 
 Consultar el hash del ultimo commit con
-`git log --oneline --grep="docs(RQF-08,RQNF-08)"`. Esta entrega no se ha
+`git log --oneline --grep="docs(RQF-02,RQNF-08)"`. Esta entrega no se ha
 publicado ni integrado a main; registrar el PR y merge cuando ocurran.

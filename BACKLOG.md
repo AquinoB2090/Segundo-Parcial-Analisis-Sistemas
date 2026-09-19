@@ -5,8 +5,8 @@ REST. El estado distingue la capacidad completa de los avances de backend.
 
 ## Trabajo de Esta Rama
 
-Ramas documentadas: `feature/docker-mysql-schema`, `feature/api-rest-citas` y
-`feature/validacion-conflictos-estados`.
+Ramas documentadas: `feature/docker-mysql-schema`, `feature/api-rest-citas`,
+`feature/validacion-conflictos-estados` y `feature/fullcalendar-ui`.
 
 | Paso | Categoria | ID relacionados | Estado | Evidencia |
 | --- | --- | --- | --- | --- |
@@ -22,25 +22,25 @@ Ramas documentadas: `feature/docker-mysql-schema`, `feature/api-rest-citas` y
 | Estados centralizados, mensajes en espanol y horas parciales | Validaciones | RQF-08, RQNF-03 | Hecho | `c62dd18` |
 | Casos limite y cinco tipos de solapamiento | Calidad | RQF-03, RQF-08, RQNF-07 | Hecho | `9d0830b` |
 | Matriz y evidencia de validaciones | Documentacion | RQNF-05, RQNF-08 | Hecho en esta entrega | Commit `docs(RQF-08,RQNF-08)` |
+| Base visual, dependencias y controles adaptables | Frontend | RQF-02, RQNF-06 | Hecho | `2639197` |
+| FullCalendar, API, detalle, estados y drag & drop | Frontend | RQF-02, RQF-04, RQF-09, RQF-10 | Hecho | `f720ea0` |
+| Pruebas de transformaciones, rango y pagina | Calidad | RQF-02, RQF-04, RQNF-06 | Hecho | `bb5d02a` |
+| Guia y evidencia del calendario | Documentacion | RQNF-05, RQNF-08 | Hecho en esta entrega | Commit `docs(RQF-02,RQNF-08)` |
 
 ## Pendientes del Sistema
 
 | Categoria | ID | Trabajo pendiente |
 | --- | --- | --- |
-| Calendario | RQF-02, RQF-09, RQF-10, RQNF-06 | FullCalendar, mes/semana, detalles, colores, escritorio y tablet. |
-| Integracion visual | RQF-04 | Conectar el drag & drop de FullCalendar al `PUT` ya disponible. |
-| Arquitectura | RQNF-04 | Completar la capa de presentacion; API, negocio y datos ya estan separados. |
 | Git | RQNF-05 | Completar ramas por funcionalidad, PR y merge documentados. |
-| Evidencia | RQNF-08 | Agregar capturas del calendario cuando exista esa funcionalidad. |
+| Evidencia visual | RQNF-06, RQNF-08 | Capturar escritorio y tablet cuando el navegador integrado este disponible. |
 
 ## Trazabilidad
 
 Cada commit y PR debe mencionar los ID afectados y su validacion. Ramas
 propuestas para el trabajo restante:
 
-- `feature/calendario-citas`: calendario e interaccion.
 - `feature/evidencia-integracion`: evidencia de integracion.
 
-Las ramas restantes son propuestas, no un registro de creacion. Los commits de
-validaciones estan locales en `feature/validacion-conflictos-estados`; su push,
-PR y merge siguen pendientes.
+La rama restante es propuesta, no un registro de creacion. Los commits del
+calendario estan locales en `feature/fullcalendar-ui`; su push, PR y merge
+siguen pendientes.
