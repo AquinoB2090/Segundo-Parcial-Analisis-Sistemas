@@ -5,8 +5,8 @@ Fecha: 2026-09-19. Rama: `feature/docker-mysql-schema`.
 ## Alcance y Versiones
 
 PHP y Laravel corren en Windows; Docker ejecuta solamente MySQL. Se verificaron
-arranque, conexion, migraciones, semillas, restricciones y persistencia.
-La API REST y FullCalendar quedan pendientes.
+arranque, conexion, migraciones, semillas, restricciones, persistencia y API
+REST. FullCalendar queda pendiente.
 
 | Componente | Version observada |
 | --- | --- |
@@ -123,8 +123,41 @@ Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/up | Select-Object Stat
 ```
 
 Ambas rutas respondieron **200**. `/up` comprueba el arranque; la conexion a
-MySQL se verifico aparte con migraciones y `db:show`. No se presentan estas
-respuestas como evidencia de los endpoints de citas pendientes.
+MySQL se verifico aparte con migraciones y `db:show`. Estas dos respuestas solo
+documentan el entorno; la evidencia de los endpoints aparece a continuacion.
+
+## API REST
+
+Rama: `feature/api-rest-citas`.
+
+```sh
+php artisan route:list --path=api
+php artisan test
+```
+
+Se registraron siete rutas: listado, creacion, detalle y actualizacion de citas;
+cambio de estado; listado de doctores y listado de pacientes. La suite completa
+se ejecuto en SQLite en memoria y en `citas_medicas_test` sobre MySQL 8.4.
+En ambos motores el resultado fue **23 pruebas aprobadas, 132 aserciones**.
+
+Las pruebas cubren respuestas `200`, `201`, `400`, `404` y `409`; filtros por
+doctor, paciente y fechas; relaciones JSON; datos obligatorios; referencias
+inexistentes; creacion; detalle; reprogramacion; cancelacion sin borrado;
+horarios adyacentes; solapamientos; uso del horario de una cita cancelada y el
+rechazo al reactivarla cuando ya existe otro compromiso.
+
+Con el servidor local se verificaron tambien estos casos contra MySQL:
+
+| Solicitud | Resultado observado |
+| --- | --- |
+| `GET /api/citas?doctor_id=1&desde=2026-09-21&hasta=2026-09-21` | `200`, 2 citas |
+| `GET /api/citas?doctor_id=999999` | `400` |
+| `GET /api/citas/999999` | `404` |
+| `POST /api/citas` sobre el horario `2026-09-21 09:15-09:45` del doctor 1 | `409` |
+
+La comprobacion de conflicto no creo registros. Una cita temporal utilizada
+para inspeccionar el cuerpo `201` se elimino por su identidad exacta; la base
+local conserva las 5 citas semilla.
 
 ## Commits por Paso
 
@@ -134,9 +167,12 @@ respuestas como evidencia de los endpoints de citas pendientes.
 | `ece2260` | Docker Compose y conexion | RQNF-01, RQNF-02 |
 | `0bb5348` | Reproducibilidad en Windows | RQNF-02 |
 | `5c47e4c` | Esquema, modelos, semillas y pruebas | RQF-01, RQF-05, RQF-08, RQNF-01 |
-| `docs(RQNF-05,RQNF-08)` | Esta documentacion y plantilla de PR | RQNF-05, RQNF-08 |
+| `aed2381` | Documentacion del entorno y plantilla de PR | RQNF-05, RQNF-08 |
+| `e84abcd` | Endpoints, validaciones y recursos JSON | RQF-07, RQF-08, RQNF-03 |
+| `25773e7` | Disponibilidad y estados transaccionales | RQF-03, RQF-05, RQNF-07 |
+| `1763961` | Pruebas HTTP en SQLite y MySQL | RQF-01, RQF-03, RQF-07, RQF-08, RQNF-03 |
+| `docs(RQF-07,RQNF-08)` | Contratos y evidencia de API | RQF-07, RQNF-08 |
 
-Consultar el hash de documentacion con
-`git log --oneline --grep="docs(RQNF-05,RQNF-08)"`. Los ID funcionales en los
-commits indican soporte de datos, no implementacion de la API. Esta entrega
-no se ha publicado ni integrado a main; registrar el PR y merge cuando ocurran.
+Consultar el hash del ultimo commit con
+`git log --oneline --grep="docs(RQF-07,RQNF-08)"`. Esta entrega no se ha
+publicado ni integrado a main; registrar el PR y merge cuando ocurran.
