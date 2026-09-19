@@ -94,9 +94,9 @@ impiden borrar doctores o pacientes con citas. Los estados son `pendiente`,
 `confirmada`, `cancelada` y `atendida`, con `pendiente` como valor inicial.
 Hay indices por doctor/horario, paciente/fecha y fecha.
 
-Los indices no impiden solapamientos: la validacion transaccional del servidor
-de `RQF-03` y `RQNF-07`, el orden de las horas y las transiciones de estado
-quedan pendientes para la API.
+Los indices apoyan la consulta de disponibilidad. La API valida el orden de las
+horas y los solapamientos de forma transaccional en el servidor, como exigen
+`RQF-03` y `RQNF-07`.
 
 ```sh
 php artisan migrate --seed
@@ -156,6 +156,36 @@ cubre la baja logica del CRUD. Una cita cancelada deja libre su horario. Al
 crear, reprogramar o reactivar, el servidor bloquea al doctor dentro de una
 transaccion y responde `409` si otra cita activa se solapa. Los horarios que
 terminan exactamente cuando comienza otro son validos.
+
+### Validaciones
+
+| Entrada | Reglas del servidor |
+| --- | --- |
+| `paciente_id` | Obligatorio al crear, entero y paciente existente. |
+| `doctor_id` | Obligatorio al crear, entero y doctor existente y activo. |
+| `fecha` | Obligatoria al crear y formato exacto `YYYY-MM-DD`. |
+| `hora_inicio` | Obligatoria al crear y formato exacto `HH:mm`. |
+| `hora_fin` | Obligatoria al crear, formato `HH:mm` y posterior al inicio. |
+| `motivo` | Obligatorio al crear, texto y maximo 1000 caracteres. |
+| `estado` | Uno de los cuatro estados admitidos. |
+| `desde`, `hasta` | Formato `YYYY-MM-DD`; `hasta` no puede preceder a `desde`. |
+
+En `PUT`, las horas enviadas se comparan tambien con la hora existente, por lo
+que una actualizacion parcial no puede dejar inicio y fin iguales o invertidos.
+Un cuerpo `PUT` vacio responde `400`. Las referencias inexistentes, doctores
+inactivos, JSON malformado y valores fuera de formato tambien responden `400`
+sin persistir cambios.
+
+Ejemplo de error de validacion:
+
+```json
+{
+  "message": "Los datos proporcionados no son validos.",
+  "errors": {
+    "doctor_id": ["El valor seleccionado para doctor no es valido."]
+  }
+}
+```
 
 ## Verificacion
 
