@@ -34,8 +34,9 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
-            "@php artisan migrate --force",
-            "npm install",
+            "docker compose up -d --wait --wait-timeout 180",
+            "@php artisan migrate --seed",
+            "npm ci",
             "npm run build"
         ],
         "dev": [
