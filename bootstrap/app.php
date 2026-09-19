@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request): bool => $request->is('api/*') || $request->expectsJson()
         );
 
-        $exceptions->render(function (ModelNotFoundException $exception, Request $request) {
+        $exceptions->render(function (NotFoundHttpException $exception, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json(['message' => 'Recurso no encontrado.'], 404);
             }

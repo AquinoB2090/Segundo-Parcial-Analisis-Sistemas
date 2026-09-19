@@ -13,16 +13,18 @@ class CitaService
     public function crear(array $datos): Cita
     {
         return DB::transaction(function () use ($datos): Cita {
+            $datos = $this->normalizarHoras($datos);
             $this->bloquearDoctor($datos['doctor_id']);
             $this->comprobarDisponibilidad($datos);
 
-            return Cita::create($datos)->load(['doctor', 'paciente']);
+            return Cita::create($datos)->refresh()->load(['doctor', 'paciente']);
         });
     }
 
     public function actualizar(Cita $cita, array $datos): Cita
     {
         return DB::transaction(function () use ($cita, $datos): Cita {
+            $datos = $this->normalizarHoras($datos);
             $valores = [...$cita->only([
                 'paciente_id', 'doctor_id', 'fecha', 'hora_inicio', 'hora_fin', 'motivo', 'estado',
             ]), ...$datos];
@@ -81,5 +83,16 @@ class CitaService
         if ($existeConflicto) {
             throw new HorarioNoDisponibleException;
         }
+    }
+
+    private function normalizarHoras(array $datos): array
+    {
+        foreach (['hora_inicio', 'hora_fin'] as $campo) {
+            if (isset($datos[$campo]) && strlen($datos[$campo]) === 5) {
+                $datos[$campo] .= ':00';
+            }
+        }
+
+        return $datos;
     }
 }
